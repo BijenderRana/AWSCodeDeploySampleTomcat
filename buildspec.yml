@@ -1,0 +1,28 @@
+version: 0.2env:
+shell: bashphases:
+install:
+runtime-versions:
+java: corretto8
+commands:
+echo "Install"
+pre_build:
+commands:
+echo "Prebuild"
+build:
+commands:
+echo "Build"
+mvn clean install package -DskipTest=true
+post_build:
+commands:
+echo "PostBuild"
+mkdir artifacts
+mv wallet/target/LoginWebApp-1.war artifacts/LoginWebApp-1.war
+version=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)
+sed -i s/VALUE/$version/g deployments/application/scripts/after_install.sh
+mv deployments/application/appspec.yml artifacts/appspec.yml
+mv deployments/application/scripts artifacts/artifacts:
+files:
+'**/*'
+base-directory: artifacts/cache:
+paths:
+'/root/.m2/**/*'
